@@ -48,9 +48,8 @@ size_t NibbleArray::storageSize() const {
     return this->arr.size();
 }
 
-// Move all the moves to a vector. This doubles the size, but is faster to access,
-// since there is no bitwise operation needed.
-
+/* Move all the values to a vector of int. This doubles the size, but is faster to access,
+   since there is no bitwise operation needed. */
 void NibbleArray::inflate(vector<uint8_t> &dest) const {
     dest.reserve(this->size);
 
