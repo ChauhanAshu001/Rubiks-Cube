@@ -211,3 +211,132 @@ vector<RubiksCube::MOVE> RubiksCube::randomShuffleCube(unsigned int times) {
     }
     return moves_performed;
 }
+
+//The below 3 functions are used in IDA* algorithm
+
+//This helper function returns string of corner
+string RubiksCube::getCornerColorString(uint8_t ind) const {
+    string str = "";
+
+    switch (ind) {
+        // UFR(Up,Front,Right)
+        case 0:
+            str += getColorLetter(getColor(FACE::UP, 2, 2));
+            str += getColorLetter(getColor(FACE::FRONT, 0, 2));
+            str += getColorLetter(getColor(FACE::RIGHT, 0, 0));
+            break;
+
+        //UFL
+        case 1:
+            str += getColorLetter(getColor(FACE::UP, 2, 0));
+            str += getColorLetter(getColor(FACE::FRONT, 0, 0));
+            str += getColorLetter(getColor(FACE::LEFT, 0, 2));
+            break;
+
+        //UBL(Up,back,Left)
+        case 2:
+            str += getColorLetter(getColor(FACE::UP, 0, 0));
+            str += getColorLetter(getColor(FACE::BACK, 0, 2));
+            str += getColorLetter(getColor(FACE::LEFT, 0, 0));
+            break;
+
+//            UBR
+        case 3:
+            str += getColorLetter(getColor(FACE::UP, 0, 2));
+            str += getColorLetter(getColor(FACE::BACK, 0, 0));
+            str += getColorLetter(getColor(FACE::RIGHT, 0, 2));
+            break;
+
+//            DFR(down,front,right)
+        case 4:
+            str += getColorLetter(getColor(FACE::DOWN, 0, 2));
+            str += getColorLetter(getColor(FACE::FRONT, 2, 2));
+            str += getColorLetter(getColor(FACE::RIGHT, 2, 0));
+            break;
+
+//            DFL
+        case 5:
+            str += getColorLetter(getColor(FACE::DOWN, 0, 0));
+            str += getColorLetter(getColor(FACE::FRONT, 2, 0));
+            str += getColorLetter(getColor(FACE::LEFT, 2, 2));
+            break;
+
+//            DBR(down,back,right)
+        case 6:
+            str += getColorLetter(getColor(FACE::DOWN, 2, 2));
+            str += getColorLetter(getColor(FACE::BACK, 2, 0));
+            str += getColorLetter(getColor(FACE::RIGHT, 2, 2));
+            break;
+
+//            DBL
+        case 7:
+            str += getColorLetter(getColor(FACE::DOWN, 2, 0));
+            str += getColorLetter(getColor(FACE::BACK, 2, 2));
+            str += getColorLetter(getColor(FACE::LEFT, 2, 0));
+            break;
+    }
+    return str;
+}
+
+uint8_t RubiksCube::getCornerIndex(uint8_t ind) const {
+    /*Every corner piece on a Rubik's cube has exactly 3 stickers. A standard cube uses 3 pairs of opposite faces: 
+    White/Yellow, Red/Orange, and Blue/Green.
+    No single corner piece can ever have both opposite colors (e.g., a corner cannot be White and Yellow at the same time). 
+    Therefore, every corner piece has exactly one color from each pair. This function assigns a unique 3-bit identifier 
+    (000 to 111, which translates to 0 to 7) to a corner based on which colors it contains, regardless of how it is twisted.
+
+    Summary mapping result: A White-Red-Blue corner maps to 0 (000). A Yellow-Orange-Green corner maps to 7 (111).
+    This gives us a fixed, immutable identity index for all 8 physical pieces.
+    */
+    string corner = getCornerColorString(ind);
+
+    uint8_t ret = 0;
+    for (auto c: corner) {
+        if (c != 'W' && c != 'Y') continue;
+        if (c == 'Y') {
+            ret |= (1 << 2);
+        }
+    }
+
+    for (auto c: corner) {
+        if (c != 'R' && c != 'O') continue;
+        if (c == 'O') {
+            ret |= (1 << 1);
+        }
+    }
+
+    for (auto c: corner) {
+        if (c != 'B' && c != 'G') continue;
+        if (c == 'G') {
+            ret |= (1 << 0);
+        }
+    }
+    return ret;
+}
+
+uint8_t RubiksCube::getCornerOrientation(uint8_t ind) const {
+    string corner = getCornerColorString(ind);
+
+    /*Orientation tracks how many times a corner piece has been twisted in place relative to the vertical axis of the cube 
+    (the White/Yellow faces).
+
+    0: Correctly oriented (White or Yellow sticker is facing Up or Down).
+
+    1: Clockwise twist (White or Yellow sticker has drifted to the second face slot of the corner position).
+
+    2: Counter-clockwise twist (White or Yellow sticker has drifted to the third face slot of the corner position). 
+    
+    */
+    string actual_str = "";
+
+    for (auto c: corner) {
+        if (c != 'W' && c != 'Y') continue;
+        actual_str.push_back(c);
+    }
+
+    if (corner[1] == actual_str[0]) {
+        return 1;
+    } else if (corner[2] == actual_str[0]) {
+        return 2;
+    } else return 0;
+}

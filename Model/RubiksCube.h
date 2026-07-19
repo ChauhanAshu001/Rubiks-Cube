@@ -166,6 +166,13 @@ public:
 
     virtual RubiksCube &b2() = 0;
 
+
+    //The below 3 functions are used in IDA* solver
+    string getCornerColorString(uint8_t ind) const;
+
+    uint8_t getCornerIndex(uint8_t ind) const;
+
+    uint8_t getCornerOrientation(uint8_t ind) const;
     
 };
 
