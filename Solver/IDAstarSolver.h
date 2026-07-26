@@ -22,7 +22,7 @@ class IDAstarSolver {
         };
 
         struct compareCube {
-            bool operator()(pair<Node, int> const &p1, pair<Node, int> const &p2) {
+            bool operator()(pair<Node, int> const &p1 , pair<Node, int> const &p2) {
                 auto n1 = p1.first, n2 = p2.first;
                 if (n1.depth + n1.estimate == n2.depth + n2.estimate) {
                     return n1.estimate > n2.estimate;
